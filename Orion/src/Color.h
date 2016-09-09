@@ -6,7 +6,8 @@ namespace Orion {
 
 	class Color {
 	public:
-		Color(unsigned int r, unsigned int, g, unsigned int b);
+		Color();
+		Color(unsigned int r, unsigned int g, unsigned int b);
 		unsigned int r();
 		unsigned int g();
 		unsigned int b();

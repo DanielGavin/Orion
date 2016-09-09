@@ -15,8 +15,9 @@ namespace Orion {
 		Gui(Style* style);
 		~Gui();
 
-		//set what the metric of the font that is used - this is used to make the dynamic layout scale widgets correctly with text.
-		void setFontMetric(const unsigned int& w, const unsigned int& h);
+		//font functions
+		void setFontAtlas(void* data);
+		void setFontIndex(unsigned int i);
 
 		//dynamic layout functions
 		void beginLayout(Layout* layout);
@@ -38,9 +39,9 @@ namespace Orion {
 		std::stack<Layout*> m_layout;
 		CommandQueue* m_queue;
 		Style* m_style;
-	}
+	};
 
-};
+}
 
 
 

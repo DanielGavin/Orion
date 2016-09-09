@@ -21,11 +21,13 @@ namespace Orion {
 	};
 
 
-	//Idea is to handle layout based on what happend last frame, since we cannot know what happens this frame.
+	//Idea is to handle layout based on what happened last frame, since we cannot know what happens this frame.
 	class Layout {
 	public:
 		void addItem(LayoutItem item);
-		virtual LayoutPosition item(void* identifier) = 0;
+		virtual LayoutPosition item(void* identifier) = 0; //get the layout position, is derived by each different layout.
+		virtual unsigned int width() = 0; //get the width of the layout, used for having layouts in layouts.
+		virtual unsigned int height() = 0; //get the height of the layout, used for having layouts in layouts.
 	protected:
 		std::vector<LayoutItem> m_lastItems;//stores the last frames items
 		unsigned int m_width; //max width of the layout

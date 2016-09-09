@@ -1,22 +1,31 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <stdint.h>
+
+//might move some classes over to their seperate file, if they become large enough to warrant it.
+
 namespace Orion {
 
 	template<class T>
 	class Vec2 {
 	public:
+		Vec2()
+			: m_x(0), m_y(0)
+		{
+		}
+
 		Vec2(T x, T y)
 			: m_x(x), m_y(y)
 		{
 		}
 
-		Vec2<T> operator+(const Vector2D<T>& b)
+		Vec2<T> operator+(const Vec2<T>& b)
 		{
 			return Vec2(this->m_x + b.m_x, this->m_y + b.m_y);
 		}
 
-		Vec2<T> operator-(const Vector2D<T>& b)
+		Vec2<T> operator-(const Vec2<T>& b)
 		{
 			return Vec2(this->m_x - b.m_x, this->m_y - b.m_y);
 		}
@@ -39,6 +48,16 @@ namespace Orion {
 	private:
 		T m_x;
 		T m_y;
+	};
+
+
+	//pod structure for sorting draw commands.
+	//exactly 64 bit, so it can be used as a int64_t key.
+	struct Clip {
+		int16_t x;
+		int16_t y;
+		int16_t width; 
+		int16_t height;
 	};
 
 		
