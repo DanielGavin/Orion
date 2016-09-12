@@ -12,19 +12,34 @@ namespace Orion {
 	{
 	}
 
-	unsigned int Color::r() 
+	unsigned int Color::r() const
 	{
 		return m_r;
 	}
 
-	unsigned int Color::g() 
+	unsigned int Color::g() const
 	{
 		return m_g;
 	}
 
-	unsigned int Color::b() 
+	unsigned int Color::b() const
 	{
 		return m_b;
+	}
+
+	float Color::rn() const
+	{
+		return (float)m_r / 255.0;
+	}
+
+	float Color::gn() const
+	{
+		return (float)m_g / 255.0;
+	}
+
+	float Color::bn() const
+	{
+		return (float)m_b / 255.0;
 	}
 
 }

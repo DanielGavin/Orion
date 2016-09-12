@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "stb_truetype.h"
+
 //might move some classes over to their seperate file, if they become large enough to warrant it.
 
 namespace Orion {
@@ -11,7 +13,6 @@ namespace Orion {
 	class Vec2 {
 	public:
 		Vec2()
-			: m_x(0), m_y(0)
 		{
 		}
 
@@ -36,12 +37,12 @@ namespace Orion {
 			this->m_y = b.m_y;
 		}
 
-		T x()
+		T x() const
 		{
 			return m_x;
 		}
 		
-		T y()
+		T y() const
 		{
 			return m_y;
 		}
@@ -60,6 +61,10 @@ namespace Orion {
 		int16_t height;
 	};
 
+	struct FontAtlas {
+		stbtt_bakedchar cdata[96];
+		unsigned char* bitmap;
+	};
 		
 	class Rect {
 

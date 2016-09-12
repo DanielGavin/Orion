@@ -3,21 +3,24 @@
 
 #include <stack>
 
+#include "DataTypes.h"
+#include <map>
+
 
 namespace Orion {
 
 	class Style;
 	class Layout;
-	class CommandQueue;
+	class DrawQueue;
 
 	class Gui {
 	public:
-		Gui(Style* style);
+		Gui(const unsigned int& width, const unsigned int& height, Style* style);
 		~Gui();
 
 		//font functions
-		void setFontAtlas(void* data);
-		void setFontIndex(unsigned int i);
+		int createFontAtlas(void* data);
+		void setFont(const unsigned int& i);
 
 		//dynamic layout functions
 		void beginLayout(Layout* layout);
@@ -29,15 +32,22 @@ namespace Orion {
 
 
 		//clipping
-		void beginClipRect(...);
-		void endClipRect(...);
+		void beginClipRect(const unsigned int& x, const unsigned int& y, 
+						   const unsigned int& width, const unsigned int& height);
+		void endClipRect();
 
 		//fixed layout functions
 		bool button(const unsigned int& x, const unsigned int& y,
-			const unsigned int& w, const unsigned int& h, char* text);
+			const unsigned int& w, const unsigned int& h, const char* text);
+
+		void label(const unsigned int& x, const unsigned int& y, 
+			const unsigned int& size, const char* text);
 	private:
 		std::stack<Layout*> m_layout;
-		CommandQueue* m_queue;
+		std::stack<Clip> m_clips;
+		std::map<unsigned int, const char*> m_textures;
+		std::map<unsigned int, FontAtlas> m_fonts;
+		DrawQueue* m_queue;
 		Style* m_style;
 	};
 

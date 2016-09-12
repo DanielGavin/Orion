@@ -9,78 +9,62 @@
 
 namespace Orion {
 
-	struct CmdDrawTriangle {
-		Vec2<float> p1;
-		Vec2<float> p2;
-		Vec2<float> p3;
-		Color color;
-	};
+	typedef std::vector<float> CmdDataVector;
 
-	struct CmdDrawRect {
-		Vec2<float> pos;
-		float width;
-		float height;
-		bool filled;
-		Color color;
-	};
-
-	struct CmdDrawLine {
-		Vec2<float> p1;
-		Vec2<float> p2;
-		float thickness;
-		Color color;
-	};
-
-	struct CmdDrawText {
-		Vec2<float> pos;
-		void* font;
-		std::string string;
-		Color color;
-	};
-
-	struct CmdDrawRectTextured {
-
-	};
-
-	struct FontAtlas {
-
-	};
-
-	typedef std::vector<CmdDrawRect> CmdDrawRectVector;
-	typedef std::vector<CmdDrawLine> CmdDrawLineVector;
-	typedef std::vector<CmdDrawTriangle> CmdDrawTriangleVector;
-	typedef std::vector<CmdDrawText> CmdDrawTextVector;
-
-	//records the different commands, and can convert those commands into triangle data for use in opengl, directx, etc
-	//command draws are sorted per clipping rect and texture(only for text and RectTextured).
 	class DrawQueue {
 	public:
+		DrawQueue();
+
 		//clear the commands
 		void clear();
+
+		//get the next untextured prim triangle
+		std::pair<Clip, CmdDataVector*> nextTriangleCmd();
+		unsigned int TrianglesCount();
+
+		void beginTriangle(const unsigned int& idx);
+		void endTriangle();
 
 		//primtive draw commands that directly map to commands for gpu commands
 		void drawPrimTriangle(const Vec2<float>& p1, const Vec2<float>& p2, const Vec2<float>& p3, const Color& color);
 		void drawPrimRect(const Vec2<float>& p, const float& width, const float& height, const Color& color);
 
+		void drawText(const Vec2<float>& p, const unsigned int& size, const char* text);
+
 		//geometry with thickness made with lines
 		void drawTriangle(const Vec2<float>& p1, const Vec2<float>& p2, const Vec2<float>& p3, const float& thickness, const Color& color);
 
-		//Lets the CommandQueue know which clipping rect is currently used. 
+		//Lets the DrawQueue know which clipping rect is currently used. 
 		void setClipRect(const Clip& clip);
+
+		//set the depth of the draw commands
+		void setDepth(const unsigned int& depth);
+
+		//set the current atlas and font
+		void setFontAtlas(FontAtlas* atlas);
+		void setFontIndex(const unsigned int& idx);
 	private:
 		//current clip region
 		Clip m_currentClip;
 
-		//texture ids and baked atlas
-		FontAtlas m_fontAtlas;
+		//current id texture
+		int m_currentTextureId;
 
-		//keep the different commands type sorted by clip
-		std::map<int64_t, CmdDrawRectVector> m_cmdRect;
-		std::map<int64_t, CmdDrawLineVector> m_cmdLine;
-		std::map<int64_t, CmdDrawTriangleVector> m_cmdTriangle;
+		//current z depth
+		unsigned int m_depth;
 
-		//keep the text sorted by atlas texture id and clip
-		std::map<int64_t, std::map<int, CmdDrawTextVector>> m_cmdText;
+		//baked atlas info
+		FontAtlas* m_fontAtlas;
+
+		//keep the triangles sorted by atlas texture id and clip(0 is untextured)
+		std::map<int, std::map<int64_t, CmdDataVector>> m_cmdTriangles;
+
+		//keep the lines sorted by clip
+		std::map<int, CmdDataVector> m_cmdLines;
+
+		//used for iterating through cmds.
+		std::map<int64_t, CmdDataVector>::iterator m_it;
+
 	};
 
 }

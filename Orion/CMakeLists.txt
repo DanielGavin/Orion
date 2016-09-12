@@ -26,6 +26,7 @@ set(HEADER
 	${SRC_DIR}/DrawQueue.h
 	${SRC_DIR}/Layout.h
 	${SRC_DIR}/Style.h
+	${SRC_DIR}/DefaultStyle.h
 	${SRC_DIR}/Color.h
 	${SRC_DIR}/DataTypes.h
 )
@@ -34,7 +35,7 @@ set(SOURCE
 	${SRC_DIR}/Gui.cpp
 	${SRC_DIR}/DrawQueue.cpp
 	${SRC_DIR}/Layout.cpp
-	${SRC_DIR}/Style.cpp
+	${SRC_DIR}/DefaultStyle.cpp
 	${SRC_DIR}/Color.cpp
 )
 
