@@ -1,53 +1,92 @@
 #include "Gui.h"
+
+#include <memory>
+
 #include "Style.h"
 #include "DrawQueue.h"
+#include "Font.h"
 
 namespace Orion {
 
 	Gui::Gui(const unsigned int& width, const unsigned int& height, Style * style)
+		: m_style(style), m_counter(0), m_queue(new DrawQueue)
 	{
-		m_style = style;
-
 		Clip clip;
-		clip.width = width;
-		clip.height = height;
+		clip.width = (int16_t)width;
+		clip.height = (int16_t)height;
 		clip.x = 0;
 		clip.y = 0;
 		m_clips.push(clip);
 
-		//allocate the queue and set the clip to be the size of the window.
-		m_queue = new DrawQueue();
+		//set the clip to be the size of the window.
 		m_queue->setClipRect(clip);
 	}
 
 	Gui::~Gui()
 	{
-		delete m_queue;
 	}
 
-	int Gui::createFontAtlas(void* data)
+	DrawQueue* Gui::queue()
 	{
-		//test bitmap code
-		FontAtlas font;
+		return m_queue.get();
+	}
 
-		font.bitmap = new unsigned char[1024 * 1024];
+	void Gui::clear()
+	{
+		m_queue->clear();
+	}
 
-		auto ret = stbtt_BakeFontBitmap((const unsigned char*)data, 0, 32.0, font.bitmap, 1024, 1024, 32, 96, font.cdata);
+	unsigned int Gui::createFont(void* data)
+	{
+		Font* font = new Font(data);
 
-		int i = (int)m_fonts.size();
-		m_fonts[i] = font;
-		return i;
+		Texture texture;
+		texture.components = 1; 
+		texture.data = font->bitmap();
+		texture.width = font->width();
+		texture.height = font->height();
+
+		m_fonts[m_counter] = std::unique_ptr<Font>(font);
+		m_textures[m_counter] = texture;
+
+		return m_counter++;
+	}
+
+	unsigned int Gui::createTexture(const unsigned int & width, const unsigned int & height, const unsigned int & components, void * data)
+	{
+		return m_counter++;
 	}
 
 	void Gui::setFont(const unsigned int& i)
 	{
-
+		m_currentAtlasId = i;
+		m_queue->setFont(m_fonts[i].get());
 	}
 
-	void Gui::label(const unsigned int & x, const unsigned int & y, const unsigned int& size, const char * text)
+	Texture Gui::texture(unsigned int idx)
 	{
-		Vec2<float> p(x, y);
-		m_style->drawLabel(m_queue, p, size, text);
+		return m_textures[idx];
+	}
+
+	void Gui::label(const unsigned int & x, const unsigned int & y, 
+					const unsigned int& size, const char * text, const Color& color)
+	{
+		Vec2<float> p((float)x, (float)y);
+		beginTextureId(m_currentAtlasId);
+		m_style->drawLabel(m_queue.get(), p, size, text, color);
+		endTextureId();
+	}
+
+	void Gui::beginTextureId(const unsigned int & id)
+	{
+		m_textureId.push(id);
+		m_queue->setTextureId(m_textureId.top());
+	}
+
+	void Gui::endTextureId()
+	{
+		m_textureId.pop();
+		m_queue->setTextureId(m_textureId.top());
 	}
 
 }

@@ -4,6 +4,8 @@
 
 #include "stb_truetype.h"
 
+#include "Font.h"
+
 namespace Orion {
 
 	DrawQueue::DrawQueue()
@@ -11,31 +13,44 @@ namespace Orion {
 	{
 	}
 
+	//currently all the commands have seperate vectors and then copied to one vector
+	std::pair<std::vector<float>&, std::vector<CmdInfo>&> DrawQueue::createScene()
+	{
+		auto it1 = m_cmdTriangles.begin();
+
+		for (; it1 != m_cmdTriangles.end(); ++it1) {
+
+			auto cmd = it1->second;
+			auto textureId = it1->first;
+			auto it2 = cmd.begin();
+
+			for (; it2 != cmd.end(); ++it2) {
+
+				auto v = it2->second;
+				Clip clip = *(Clip*)&it2->first;
+
+				CmdInfo info;
+				info.offset = (unsigned int)m_buffer.size();
+				info.size = (unsigned int)v.size();
+				info.textureId = textureId;
+				info.clip = clip;
+
+				//copy the content of the buffer to the end of the final buffer
+				m_buffer.insert(m_buffer.end(), v.begin(), v.end());
+				m_commands.push_back(info);
+			}
+		}
+
+		return std::pair<std::vector<float>&, std::vector<CmdInfo>&>(m_buffer, m_commands);
+	}
+
 	void DrawQueue::clear()
 	{
+		m_buffer.clear();
+		m_commands.clear();
+		m_cmdTriangles.clear();
 	}
 
-	unsigned int DrawQueue::TrianglesCount()
-	{
-		return (unsigned int)m_cmdTriangles.size();
-	}
-
-	void DrawQueue::beginTriangle(const unsigned int& idx)
-	{
-		m_it = m_cmdTriangles[idx].begin();
-	}
-
-	void DrawQueue::endTriangle()
-	{
-	}
-
-	std::pair<Clip, CmdDataVector*> DrawQueue::nextTriangleCmd()
-	{
-		CmdDataVector* v = &m_it->second;
-		auto clip = &m_it->first;
-		m_it++;
-		return std::pair<Clip, CmdDataVector*>(*(Clip*)clip, v);
-	}
 
 	void DrawQueue::drawPrimTriangle(const Vec2<float>& p1, const Vec2<float>& p2, const Vec2<float>& p3, const Color& color)
 	{
@@ -123,7 +138,7 @@ namespace Orion {
 		v->push_back(color.bn());
 	}
 
-	void DrawQueue::drawText(const Vec2<float>& p, const unsigned int& size, const char* text)
+	void DrawQueue::drawText(const Vec2<float>& p, const unsigned int& size, const char* text, const Color& color)
 	{
 		//TODO(currently just test code, does not handle different size fonts)
 		CmdDataVector* v = &m_cmdTriangles[m_currentTextureId][(int64_t)&m_currentClip];
@@ -134,26 +149,30 @@ namespace Orion {
 		while (*text) {
 			
 			if (*text >= 32 && *text <= 128) {
-				stbtt_aligned_quad q;
-				stbtt_GetBakedQuad(m_fontAtlas->cdata, 512, 512, *text - 32, &x, &y, &q, 1);
+
+				auto q = m_font->quadAsciiCharacter(&x, &y, *text);
 
 				v->push_back(q.x0);
 				v->push_back(q.y0);
+				v->push_back((float)m_depth);
 				v->push_back(q.s0);
 				v->push_back(q.t1);
 
 				v->push_back(q.x1);
 				v->push_back(q.y0);
+				v->push_back((float)m_depth);
 				v->push_back(q.s1);
 				v->push_back(q.t1);
 
 				v->push_back(q.x1);
 				v->push_back(q.y1);
+				v->push_back((float)m_depth);
 				v->push_back(q.s1);
 				v->push_back(q.t0);
 
 				v->push_back(q.x0);
 				v->push_back(q.y1);
+				v->push_back((float)m_depth);
 				v->push_back(q.s0);
 				v->push_back(q.t0);
 			}
@@ -172,13 +191,15 @@ namespace Orion {
 		m_depth = depth;
 	}
 
-	void DrawQueue::setFontAtlas(FontAtlas * atlas)
+	void DrawQueue::setFont(Font* font)
 	{
-		m_fontAtlas = atlas;
+		m_font = font;
 	}
 
-	void DrawQueue::setFontIndex(const unsigned int & idx)
+	void DrawQueue::setTextureId(const unsigned int & idx)
 	{
+		m_currentTextureId = idx;
 	}
+
 
 }

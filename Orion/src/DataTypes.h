@@ -61,9 +61,11 @@ namespace Orion {
 		int16_t height;
 	};
 
-	struct FontAtlas {
-		stbtt_bakedchar cdata[96];
-		unsigned char* bitmap;
+	struct Texture {
+		unsigned char* data;
+		unsigned int components;
+		unsigned int width;
+		unsigned int height;
 	};
 		
 	class Rect {

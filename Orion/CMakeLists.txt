@@ -29,6 +29,7 @@ set(HEADER
 	${SRC_DIR}/DefaultStyle.h
 	${SRC_DIR}/Color.h
 	${SRC_DIR}/DataTypes.h
+	${SRC_DIR}/Font.h
 )
 
 set(SOURCE 
@@ -37,6 +38,7 @@ set(SOURCE
 	${SRC_DIR}/Layout.cpp
 	${SRC_DIR}/DefaultStyle.cpp
 	${SRC_DIR}/Color.cpp
+	${SRC_DIR}/Font.cpp
 )
 
 SOURCE_GROUP_BY_FOLDER("${CMAKE_CURRENT_SOURCE_DIR}/src" ${HEADER} ${SOURCE})
