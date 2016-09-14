@@ -21,17 +21,21 @@ int main(int argc, char *argv[])
 	Gui gui(screen_width, screen_height, &style);
 
 	SDL_Window *window = SDL_CreateWindow(
-		"Hello world", 0, 0, 640, 480,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		"Hello world", 100, 100, screen_width, screen_height,
+		SDL_WINDOW_OPENGL);
 
 	// Create an OpenGL context associated with the window.
 	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+
+	glewInit();
 
 	bool exit = 0;
 
 	auto ttf_buffer = filetobuf("c:/windows/fonts/times.ttf");
 
 	auto font_handle = gui.createFont(ttf_buffer);
+
+	gui.setFont(font_handle);
 
 	GL_Renderer renderer(&gui);
 
@@ -57,7 +61,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		gui.label(100, 100, 16, "hello world", Color(0,0,0));
+		gui.label(100, 100, 16, "hello world", Color(255,255,255));
 
 		renderer.update();
 

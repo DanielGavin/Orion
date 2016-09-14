@@ -9,7 +9,7 @@
 namespace Orion {
 
 	Gui::Gui(const unsigned int& width, const unsigned int& height, Style * style)
-		: m_style(style), m_counter(0), m_queue(new DrawQueue)
+		: m_style(style), m_counter(1), m_queue(new DrawQueue)
 	{
 		Clip clip;
 		clip.width = (int16_t)width;
@@ -86,7 +86,10 @@ namespace Orion {
 	void Gui::endTextureId()
 	{
 		m_textureId.pop();
-		m_queue->setTextureId(m_textureId.top());
+
+		if (!m_textureId.empty()) {
+			m_queue->setTextureId(m_textureId.top());
+		}
 	}
 
 }

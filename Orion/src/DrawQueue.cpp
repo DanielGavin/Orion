@@ -30,8 +30,8 @@ namespace Orion {
 				Clip clip = *(Clip*)&it2->first;
 
 				CmdInfo info;
-				info.offset = (unsigned int)m_buffer.size();
-				info.size = (unsigned int)v.size();
+				info.offset = (unsigned int)m_buffer.size()*sizeof(float);
+				info.size = (unsigned int)v.size()*sizeof(float);
 				info.textureId = textureId;
 				info.clip = clip;
 
@@ -152,28 +152,43 @@ namespace Orion {
 
 				auto q = m_font->quadAsciiCharacter(&x, &y, *text);
 
+				//first half rects
 				v->push_back(q.x0);
 				v->push_back(q.y0);
 				v->push_back((float)m_depth);
 				v->push_back(q.s0);
-				v->push_back(q.t1);
-
-				v->push_back(q.x1);
-				v->push_back(q.y0);
-				v->push_back((float)m_depth);
-				v->push_back(q.s1);
-				v->push_back(q.t1);
-
-				v->push_back(q.x1);
-				v->push_back(q.y1);
-				v->push_back((float)m_depth);
-				v->push_back(q.s1);
 				v->push_back(q.t0);
 
 				v->push_back(q.x0);
 				v->push_back(q.y1);
 				v->push_back((float)m_depth);
 				v->push_back(q.s0);
+				v->push_back(q.t1);
+
+				v->push_back(q.x1);
+				v->push_back(q.y1);
+				v->push_back((float)m_depth);
+				v->push_back(q.s1);
+				v->push_back(q.t1);
+
+				//second
+
+				v->push_back(q.x0);
+				v->push_back(q.y0);
+				v->push_back((float)m_depth);
+				v->push_back(q.s0);
+				v->push_back(q.t0);
+
+				v->push_back(q.x1);
+				v->push_back(q.y1);
+				v->push_back((float)m_depth);
+				v->push_back(q.s1);
+				v->push_back(q.t1);
+
+				v->push_back(q.x1);
+				v->push_back(q.y0);
+				v->push_back((float)m_depth);
+				v->push_back(q.s1);
 				v->push_back(q.t0);
 			}
 
