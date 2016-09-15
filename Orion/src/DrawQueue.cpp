@@ -1,9 +1,4 @@
 #include "DrawQueue.h"
-
-#define STB_TRUETYPE_IMPLEMENTATION
-
-#include "stb_truetype.h"
-
 #include "Font.h"
 
 namespace Orion {
@@ -85,10 +80,10 @@ namespace Orion {
 
 		/* p1      p4*/
 		/* p3      p2*/
-		float x_2 = p1.x();  
+		float x_2 = p1.x() + width;  
 		float y_2 = p1.y() + height;
 		
-		float x_3 = p1.x() + width;
+		float x_3 = p1.x();
 		float y_3 = p1.y() + height;
 
 		float x_4 = p1.x() + width;

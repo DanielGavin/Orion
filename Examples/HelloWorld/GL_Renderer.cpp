@@ -11,181 +11,222 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-char* filetobuf(char *file)
-{
-	FILE *fptr;
-	long length;
-	char *buf;
-
-	fptr = fopen(file, "rb"); /* Open file for reading */
-	if (!fptr) /* Return NULL on failure */
-		return NULL;
-	fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
-	length = ftell(fptr); /* Find out how many bytes into the file we are */
-	buf = new char[length + 1]; /* Allocate a buffer for the entire length of the file and a null terminator */
-	fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
-	fread(buf, length, 1, fptr); /* Read the contents of the file in to the buffer */
-	fclose(fptr); /* Close the file */
-	buf[length] = 0; /* Null terminator */
-
-	return buf; /* Return the buffer */
-}
 
 
 GL_Renderer::GL_Renderer(Orion::Gui* gui)
-	: m_gui(gui)
+    : m_gui(gui)
 {
-	glGenBuffers(1, &m_bufferId);
-
-	int IsCompiled_VS, IsCompiled_FS;
-	int IsLinked;
-
-	auto vertexsource = filetobuf("font.vertex");
-	auto fragmentsource = filetobuf("font.fragment");
-
-	auto vertexshader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexshader, 1, (const GLchar**)&vertexsource, 0);
-
-	glCompileShader(vertexshader);
-
-	glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &IsCompiled_VS);
-	if (IsCompiled_VS == false)
-	{
-		char vertexInfoLog[3000];
-		int maxLength;
-
-		glGetShaderInfoLog(vertexshader, 3000, &maxLength, vertexInfoLog);
-
-		printf("%s", vertexInfoLog);
-
-		return;
-	}
-
-	auto fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(fragmentshader, 1, (const GLchar**)&fragmentsource, 0);
-
-	glCompileShader(fragmentshader);
-
-	glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &IsCompiled_FS);
-	if (IsCompiled_FS == false)
-	{
-		char fragmentInfoLog[3000];
-		int maxLength;
-
-		glGetShaderInfoLog(fragmentshader, 3000, &maxLength, fragmentInfoLog);
-
-		printf("%s", fragmentInfoLog);
-
-		return;
-	}
-
-	m_fontShaderId = glCreateProgram();
-
-	glAttachShader(m_fontShaderId, vertexshader);
-	glAttachShader(m_fontShaderId, fragmentshader);
-
-	glBindAttribLocation(m_fontShaderId, 0, "vertex");
-	glBindAttribLocation(m_fontShaderId, 1, "uv");
-
-	glLinkProgram(m_fontShaderId);
+    auto font_vertex =
+        "#version 330\n"
+        "layout(location = 0)in vec3 vertex;\n"
+        "layout(location = 1)in vec2 uv;\n"
+        "out vec2 st;\n"
+        "uniform mat4 ortho;\n"
+        "void main(void) {\n"
+        "    st = uv;\n"
+        "    gl_Position = ortho * vec4(vertex, 1.0);\n"
+        "}";
 
 
-	glGetProgramiv(m_fontShaderId, GL_LINK_STATUS, (int *)&IsLinked);
-	if (IsLinked == false)
-	{
-		char shaderProgramInfoLog[3000];
-		int maxLength;
-		glGetProgramiv(m_fontShaderId, GL_INFO_LOG_LENGTH, &maxLength);
+    auto font_fragment =
+        "#version 330\n"
+        "out vec4 outputColor;\n"
+        "uniform sampler2D atlas;\n"
+        "in vec2 st;\n"
+        "void main(void) {\n"
+        "    outputColor = vec4(0.0, 0.0, 0.0, texture2D(atlas, st).a);\n"
+        "}\n";
+
+    auto triangles_vertex =
+        "#version 330\n"
+        "layout(location = 0)in vec3 vertex;\n"
+        "layout(location = 1)in vec3 color;\n"
+        "out vec3 frag_color;\n"
+        "uniform mat4 ortho;\n"
+        "void main(void) {\n"
+        "    frag_color = color;\n"
+        "    gl_Position = ortho * vec4(vertex, 1.0);\n"
+        "}";
+
+    auto triangles_fragment =
+        "#version 330\n"
+        "out vec4 outputColor;\n"
+        "in vec3 frag_color;\n"
+        "void main(void) {\n"
+        "    outputColor = vec4(frag_color, 1.0f);\n"
+        "}\n";
+
+    m_fontShaderId = createProgram(font_vertex, font_fragment);
+    m_triangleShaderId = createProgram(triangles_vertex, triangles_fragment);
+
+    glm::mat4 projMat = glm::ortho(0.f, 500.f, 400.f, 0.f, -1.f, 2.f);
 
 
-		glGetProgramInfoLog(m_fontShaderId, 3000, &maxLength, shaderProgramInfoLog);
+    //set the uniforms for the font program
+    glUseProgram(m_fontShaderId);
 
-		printf("%s", shaderProgramInfoLog);
+    GLint myLoc = glGetUniformLocation(m_fontShaderId, "atlas");
+    glUniform1i(myLoc, 0);
 
-		return;
-	}
+    myLoc = glGetUniformLocation(m_fontShaderId, "ortho");
+    glUniformMatrix4fv(myLoc, 1, GL_FALSE, glm::value_ptr(projMat));
 
-	delete vertexsource;
-	delete fragmentsource;
+    //set the uniform for triangle program
+    glUseProgram(m_triangleShaderId);
+
+    myLoc = glGetUniformLocation(m_triangleShaderId, "ortho");
+    glUniformMatrix4fv(myLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+
 }
 
 void GL_Renderer::update()
 {
-	//test fixed opengl
-	auto queue = m_gui->queue();
-	auto scene = queue->createScene();
+    //test fixed opengl
+    auto queue = m_gui->queue();
+    auto scene = queue->createScene();
 
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
-	glBufferData(GL_ARRAY_BUFFER, scene.first.size()*sizeof(float), scene.first.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
+    glBufferData(GL_ARRAY_BUFFER, scene.first.size() * sizeof(float), scene.first.data(), GL_STATIC_DRAW);
 
-	glEnable(GL_BLEND); 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glm::mat4 projMat = glm::ortho(0.f, 500.f, 400.f, 0.f, -1.f, 2.f);
-	//glm::mat4 projMat;
+    for (Orion::CmdInfo info : scene.second) {
 
-	for (Orion::CmdInfo info : scene.second) {
+        //triangles
+        if (info.textureId == 0) {
+            glUseProgram(m_triangleShaderId);
 
-		//triangles
-		if (info.textureId == 0) {
+            glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
 
-		}
+            glEnableVertexAttribArray(0); //vertex
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, BUFFER_OFFSET(info.offset));
+            glEnableVertexAttribArray(1); //color
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
 
-		//texture triangles
-		else {
-			auto texture = m_gui->texture(info.textureId);
+            glDrawArrays(GL_TRIANGLES, 0, info.size / (sizeof(float) * 6));
+        }
 
-			if (texture.components == 1) {
-				
-				glUseProgram(m_fontShaderId);
+        //texture triangles
+        else {
+            auto texture = m_gui->texture(info.textureId);
 
-				GLint myLoc = glGetUniformLocation(m_fontShaderId, "atlas");
-				glUniform1i(myLoc, 0);
+            if (texture.components == 1) {
 
-				myLoc = glGetUniformLocation(m_fontShaderId, "ortho");
-				glUniformMatrix4fv(myLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+                glUseProgram(m_fontShaderId);
 
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, m_textureBuffers[info.textureId]);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, m_textureBuffers[info.textureId]);
 
 
-				glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
+                glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
 
-				glEnableVertexAttribArray(0); //vertex
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset));
-				glEnableVertexAttribArray(1); //uv
-				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
+                glEnableVertexAttribArray(0); //vertex
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset));
+                glEnableVertexAttribArray(1); //uv
+                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
 
-				glDrawArrays(GL_TRIANGLES, 0, info.size / (sizeof(float)*5));
+                glDrawArrays(GL_TRIANGLES, 0, info.size / (sizeof(float) * 5));
 
-			}
+                glBindTexture(GL_TEXTURE_2D, 0);
 
-		}
+            }
 
-	}
+        }
 
-	m_gui->clear();
+    }
+
+    m_gui->clear();
 }
 
 //upload the texture to device
 void GL_Renderer::uploadTextureBuffer(const unsigned int& id)
 {
-	auto tex = m_gui->texture(id);
+    auto tex = m_gui->texture(id);
 
-	GLuint ftex;
-	glGenTextures(1, &ftex);
-	glBindTexture(GL_TEXTURE_2D, ftex);
+    GLuint ftex;
+    glGenTextures(1, &ftex);
+    glBindTexture(GL_TEXTURE_2D, ftex);
 
-	if (tex.components == 1) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex.width, tex.height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, tex.data);
-	}
+    if (tex.components == 1) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex.width, tex.height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, tex.data);
+    }
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	m_textureBuffers[id] = ftex;
+    m_textureBuffers[id] = ftex;
+}
+
+unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragment)
+{
+    glGenBuffers(1, &m_bufferId);
+
+    int IsCompiled_VS, IsCompiled_FS;
+    int IsLinked;
+
+
+    auto vertexshader = glCreateShader(GL_VERTEX_SHADER);
+
+    glShaderSource(vertexshader, 1, (const GLchar**)&vertex, 0);
+
+    glCompileShader(vertexshader);
+
+    glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &IsCompiled_VS);
+    if (IsCompiled_VS == false)
+    {
+        char vertexInfoLog[3000];
+        int maxLength;
+
+        glGetShaderInfoLog(vertexshader, 3000, &maxLength, vertexInfoLog);
+
+        printf("%s", vertexInfoLog);
+
+        assert(true);
+    }
+
+    auto fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    glShaderSource(fragmentshader, 1, (const GLchar**)&fragment, 0);
+
+    glCompileShader(fragmentshader);
+
+    glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &IsCompiled_FS);
+    if (IsCompiled_FS == false)
+    {
+        char fragmentInfoLog[3000];
+        int maxLength;
+
+        glGetShaderInfoLog(fragmentshader, 3000, &maxLength, fragmentInfoLog);
+
+        printf("%s", fragmentInfoLog);
+
+        assert(true);
+    }
+
+    GLint program  = glCreateProgram();
+
+    glAttachShader(program, vertexshader);
+    glAttachShader(program, fragmentshader);
+
+
+    glLinkProgram(program);
+
+
+    glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
+    if (IsLinked == false)
+    {
+        char shaderProgramInfoLog[3000];
+        int maxLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+
+        glGetProgramInfoLog(program, 3000, &maxLength, shaderProgramInfoLog);
+
+        printf("%s", shaderProgramInfoLog);
+
+        assert(true);
+    }
+
+    return program;
 }

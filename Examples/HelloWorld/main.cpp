@@ -14,6 +14,29 @@ using namespace Orion;
 const unsigned int screen_width = 500;
 const unsigned int screen_height = 400;
 
+char* filetobuf(char *file)
+{
+    FILE *fptr;
+    long length;
+    char *buf;
+
+    fptr = fopen(file, "rb"); 
+
+    if (!fptr) {
+        return NULL;
+    }
+
+    fseek(fptr, 0, SEEK_END); 
+    length = ftell(fptr); 
+    buf = new char[length + 1]; 
+    fseek(fptr, 0, SEEK_SET);
+    fread(buf, length, 1, fptr); 
+    fclose(fptr); 
+    buf[length] = 0;
+
+    return buf; 
+}
+
 //test code
 int main(int argc, char *argv[])
 {
@@ -31,7 +54,7 @@ int main(int argc, char *argv[])
 
 	bool exit = 0;
 
-	auto ttf_buffer = filetobuf("c:/windows/fonts/times.ttf");
+	auto ttf_buffer = filetobuf("c:/windows/fonts/arial.ttf");
 
 	auto font_handle = gui.createFont(ttf_buffer);
 
@@ -61,7 +84,12 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		gui.label(100, 100, 16, "hello world", Color(255,255,255));
+        glClearColor(0.3, 0.3, 0.3, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		gui.label(100, 100, 16, "The thread 0x155c has exited with code 0 (0x0).", Color(255,255,255));
+
+        gui.button(20, 20, 30, 30, "hello");
 
 		renderer.update();
 
