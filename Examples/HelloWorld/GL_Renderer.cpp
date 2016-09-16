@@ -173,6 +173,7 @@ unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragme
     glCompileShader(vertexshader);
 
     glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &IsCompiled_VS);
+
     if (IsCompiled_VS == false)
     {
         char vertexInfoLog[3000];
@@ -192,6 +193,7 @@ unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragme
     glCompileShader(fragmentshader);
 
     glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &IsCompiled_FS);
+
     if (IsCompiled_FS == false)
     {
         char fragmentInfoLog[3000];
@@ -204,7 +206,7 @@ unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragme
         assert(true);
     }
 
-    GLint program  = glCreateProgram();
+    GLint program = glCreateProgram();
 
     glAttachShader(program, vertexshader);
     glAttachShader(program, fragmentshader);
@@ -214,6 +216,7 @@ unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragme
 
 
     glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
+
     if (IsLinked == false)
     {
         char shaderProgramInfoLog[3000];

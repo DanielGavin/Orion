@@ -30,6 +30,8 @@ set(HEADER
 	${SRC_DIR}/Color.h
 	${SRC_DIR}/DataTypes.h
 	${SRC_DIR}/Font.h
+	${SRC_DIR}/Input.h
+	${SRC_DIR}/GuiSettings.h
 )
 
 set(SOURCE 

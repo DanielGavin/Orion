@@ -52,7 +52,7 @@ namespace Orion {
         return m_counter++;
     }
 
-    unsigned int Gui::createTexture(const unsigned int & width, const unsigned int & height, const unsigned int & components, void * data)
+    unsigned int Gui::createTexture(const unsigned int& width, const unsigned int& height, const unsigned int& components, void * data)
     {
         return m_counter++;
     }
@@ -68,14 +68,56 @@ namespace Orion {
         return m_textures[idx];
     }
 
-    bool Gui::button(const unsigned int & x, const unsigned int & y, const unsigned int & w, const unsigned int & h, const char * text)
+    bool Gui::button(const char* text)
     {
-        Vec2<float> p((float)x, (float)y);
-        m_style->drawButton(m_queue.get(), p, w, h, text);
-        return true;
+        return false;
     }
 
-    void Gui::label(const unsigned int & x, const unsigned int & y,
+    bool Gui::label(const char* text, const Color& color = Color(255, 255, 255))
+    {
+        return false;
+    }
+
+    bool Gui::button(const unsigned int& x, const unsigned int& y, const unsigned int& w, const unsigned int& h, const char* text)
+    {
+        Vec2<float> p((float)x, (float)y);
+        bool ret = false;
+
+        //first check to see if the button is hovered over
+        if (m_mousePos.x() >= x && m_mousePos.x() <= x + w &&m_mousePos.y() >= y && m_mousePos.y() <= y + h) {
+            m_hot = (uintptr_t)text;
+        }
+
+        else if (m_hot == (uintptr_t)text) {
+            m_hot = 0;
+        }
+
+        //if active that means that the button has been down pressed, but we now have to see if it's released while hovering over the button
+        if (m_active == (uintptr_t)text) {
+            if (!m_mouseButtons[MOUSE_BUTTON_LEFT]) {
+
+                if (m_hot == (uintptr_t)text) {
+                    ret = true;
+                }
+
+                m_active = 0;
+            }
+        }
+
+        else if (m_hot == (uintptr_t)text) {
+
+            if (m_mouseButtons[MOUSE_BUTTON_LEFT]) {
+                m_active = (uintptr_t)text;
+            }
+            
+        }
+
+        m_style->drawButton(m_queue.get(), p, w, h, text);
+
+        return ret;
+    }
+
+    void Gui::label(const unsigned int& x, const unsigned int& y,
         const unsigned int& size, const char * text, const Color& color)
     {
         Vec2<float> p((float)x, (float)y);
@@ -84,7 +126,32 @@ namespace Orion {
         endTextureId();
     }
 
-    void Gui::beginTextureId(const unsigned int & id)
+    void Gui::buttonDown(const KEY_INPUT& input)
+    {
+        m_keys[input] = true;
+    }
+
+    void Gui::buttonUp(const KEY_INPUT& input)
+    {
+        m_keys[input] = false;
+    }
+
+    void Gui::mouseMovement(const unsigned int& x, const unsigned int& y)
+    {
+        m_mousePos = Vec2<unsigned int>(x, y);
+    }
+
+    void Gui::mouseDown(const MOUSE_INPUT& input)
+    {
+        m_mouseButtons[input] = true;
+    }
+
+    void Gui::mouseUp(const MOUSE_INPUT& input)
+    {
+        m_mouseButtons[input] = false;
+    }
+
+    void Gui::beginTextureId(const unsigned int& id)
     {
         m_textureId.push(id);
         m_queue->setTextureId(m_textureId.top());

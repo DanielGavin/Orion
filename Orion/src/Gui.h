@@ -7,6 +7,7 @@
 
 #include "DataTypes.h"
 #include "Color.h"
+#include "Input.h"
 
 
 namespace Orion {
@@ -38,7 +39,6 @@ namespace Orion {
         //set the current font
         void setFont(const unsigned int& i);
 
-
         //retrieve the texture that maps to the handle.
         Texture texture(unsigned int idx);
 
@@ -58,12 +58,23 @@ namespace Orion {
             const unsigned int& width, const unsigned int& height);
         void endClipRect();
 
-        //fixed layout functions
+        //dynamic layout widget functions
+        bool button(const char* text);
+        bool label(const char* text, const Color& color);
+
+        //fixed layout widget functions
         bool button(const unsigned int& x, const unsigned int& y,
             const unsigned int& w, const unsigned int& h, const char* text);
 
         void label(const unsigned int& x, const unsigned int& y,
             const unsigned int& size, const char* text, const Color& color);
+
+        //input interface
+        void buttonDown(const KEY_INPUT& input);
+        void buttonUp(const KEY_INPUT& input);
+        void mouseMovement(const unsigned int& x, const unsigned int& y);
+        void mouseDown(const MOUSE_INPUT& input);
+        void mouseUp(const MOUSE_INPUT& input);
     private:
         std::stack<Layout*> m_layout;
         std::stack<Clip> m_clips;
@@ -71,6 +82,10 @@ namespace Orion {
 
         std::map<unsigned int, Texture> m_textures;
         std::map<unsigned int, std::unique_ptr<Font>> m_fonts;
+        std::map<KEY_INPUT, bool> m_keys;
+        std::map<MOUSE_INPUT, bool> m_mouseButtons;
+        Vec2<unsigned int> m_mousePos;
+
 
         std::unique_ptr<DrawQueue> m_queue;
 
@@ -80,8 +95,8 @@ namespace Orion {
         unsigned int m_counter;
         unsigned int m_currentAtlasId;
 
-        void* m_hot;
-        void* m_active;
+        uintptr_t m_hot;
+        uintptr_t m_active;
     };
 
 }

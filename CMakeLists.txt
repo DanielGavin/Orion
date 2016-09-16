@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(orion)
 
-option(test "Build all tests." OFF)
-option(examples "Build all examples." OFF)
-
 if (WIN32 AND CMAKE_SYSTEM_VERSION)
     set( CMAKE_CXX_FLAGS "-W4 -EHsc" )
     set_property( GLOBAL PROPERTY USE_FOLDERS ON)	
