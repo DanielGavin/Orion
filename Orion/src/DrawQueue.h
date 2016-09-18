@@ -12,7 +12,6 @@ namespace Orion {
     class Font;
 
     typedef std::vector<float> CmdDataVector;
-    typedef std::map<int, std::map<int64_t, CmdDataVector>> PrimCmd;
 
     struct CmdInfo {
         unsigned int offset;

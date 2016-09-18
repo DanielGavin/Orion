@@ -8,12 +8,12 @@
 
 namespace Orion {
 
-	struct FontChars {
-		stbtt_packedchar chars[96];
-	};
+    struct FontChars {
+        stbtt_packedchar chars[96];
+    };
 
-	//Font class is responsible for baking individual truetype font into bitmaps for different sizes. 
-	//TODO(Currently the sizes are decided statically, but might make it dynamic if need be.)
+    //Font class is responsible for baking individual truetype font into bitmaps for different sizes. 
+    //TODO(Currently the sizes are decided statically, but might make it dynamic if need be.)
     class Font {
     public:
         explicit Font(void* data);
@@ -27,8 +27,8 @@ namespace Orion {
         unsigned char* m_bakedBitmaps;
         unsigned int m_width;
         unsigned int m_height;
-		std::vector<FontChars> m_fontChars;
-		std::vector<unsigned int> m_fontSizes;
+        std::vector<FontChars> m_fontChars;
+        std::vector<unsigned int> m_fontSizes;
     };
 
 }

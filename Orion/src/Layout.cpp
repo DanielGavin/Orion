@@ -3,8 +3,8 @@
 
 namespace Orion {
 
-	void Layout::addItem(LayoutItem item)
-	{
-	}
+    void Layout::addItem(LayoutItem item)
+    {
+    }
 
 }

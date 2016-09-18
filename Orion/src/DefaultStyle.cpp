@@ -9,10 +9,10 @@ namespace Orion {
         queue->drawText(p, size, text, color);
     }
 
-    void DefaultStyle::drawButton(DrawQueue * queue, const Vec2<float>& p1, 
+    void DefaultStyle::drawButton(DrawQueue * queue, const Vec2<float>& p1,
         const unsigned int& width, const unsigned int& height, const char * text)
     {
-		int fontSize = 16;
+        int fontSize = 16;
 
         queue->drawPrimRect(p1, (float)width, (float)height, Color(100, 100, 100));
 

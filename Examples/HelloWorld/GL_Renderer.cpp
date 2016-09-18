@@ -16,27 +16,27 @@
 GL_Renderer::GL_Renderer(Orion::Gui* gui)
     : m_gui(gui)
 {
-	auto font_vertex =
-		"#version 330\n"
-		"layout(location = 0)in vec3 vertex;\n"
-		"layout(location = 1)in vec3 color;\n"
-		"layout(location = 2)in vec2 uv;\n"
-		"out vec2 st;\n"
-		"out vec3 fragColor;\n"
-		"uniform mat4 ortho;\n"
-		"void main(void) {\n"
-		"    st = uv;\n"
-		"    fragColor = color;\n"
+    auto font_vertex =
+        "#version 330\n"
+        "layout(location = 0)in vec3 vertex;\n"
+        "layout(location = 1)in vec3 color;\n"
+        "layout(location = 2)in vec2 uv;\n"
+        "out vec2 st;\n"
+        "out vec3 fragColor;\n"
+        "uniform mat4 ortho;\n"
+        "void main(void) {\n"
+        "    st = uv;\n"
+        "    fragColor = color;\n"
         "    gl_Position = ortho * vec4(vertex, 1.0);\n"
         "}";
 
 
-	auto font_fragment =
-		"#version 330\n"
-		"out vec4 outputColor;\n"
-		"uniform sampler2D atlas;\n"
-		"in vec2 st;\n"
-		"in vec3 fragColor;\n"
+    auto font_fragment =
+        "#version 330\n"
+        "out vec4 outputColor;\n"
+        "uniform sampler2D atlas;\n"
+        "in vec2 st;\n"
+        "in vec3 fragColor;\n"
         "void main(void) {\n"
         "    outputColor = vec4(fragColor, texture2D(atlas, st).a);\n"
         "}\n";
@@ -131,8 +131,8 @@ void GL_Renderer::update()
 
                 glEnableVertexAttribArray(0); //vertex
                 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset));
-				glEnableVertexAttribArray(1); //color
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
+                glEnableVertexAttribArray(1); //color
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
                 glEnableVertexAttribArray(2); //uv
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset + 6 * sizeof(float)));
 

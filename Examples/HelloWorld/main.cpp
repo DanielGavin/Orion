@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         gui.label(100, 100, 16, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 0, 255));
-		gui.label(100, 300, 40, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 255, 0));
-		gui.label(100, 350, 8, "The thread 0x155c has exited with code 0 (0x0).", Color(0, 255, 255));
+        gui.label(100, 300, 40, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 255, 0));
+        gui.label(100, 350, 8, "The thread 0x155c has exited with code 0 (0x0).", Color(0, 255, 255));
 
         if (gui.button(20, 20, 80, 20, "hello world")) {
             printf("hello world");

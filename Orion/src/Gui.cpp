@@ -110,7 +110,7 @@ namespace Orion {
             if (m_mouseButtons[MOUSE_BUTTON_LEFT]) {
                 m_active = (uintptr_t)text;
             }
-            
+
         }
 
         m_style->drawButton(m_queue.get(), p, w, h, text);

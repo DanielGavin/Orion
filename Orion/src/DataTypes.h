@@ -67,32 +67,6 @@ namespace Orion {
         unsigned int width;
         unsigned int height;
     };
-
-    class Rect {
-
-        Rect()
-        {
-        }
-
-        Rect(const unsigned int& x, const unsigned int& y, const unsigned int& w, const unsigned int& h)
-            : m_x(x), m_y(y), m_width(w), m_height(h)
-        {
-        }
-
-        void operator=(const Rect& b)
-        {
-            this->m_x = b.m_x;
-            this->m_y = b.m_y;
-            this->m_width = b.m_width;
-            this->m_height = b.m_height;
-        }
-
-        unsigned int m_x;
-        unsigned int m_y;
-        unsigned int m_width;
-        unsigned m_height;
-    };
-
 }
 
 

@@ -8,6 +8,6 @@ namespace Orion {
         unsigned int screen_height;
     };
 
-}   
+}
 
 #endif

@@ -89,52 +89,52 @@ namespace Orion {
         float x_4 = p1.x() + width;
         float y_4 = p1.y();
 
-		float r = color.rn();
-		float g = color.gn();
-		float b = color.bn();
+        float r = color.rn();
+        float g = color.gn();
+        float b = color.bn();
 
         //half rects
         v->push_back(p1.x());
         v->push_back(p1.y());
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
 
         v->push_back(x_3);
         v->push_back(y_3);
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
 
         v->push_back(x_2);
         v->push_back(y_2);
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
 
         v->push_back(p1.x());
         v->push_back(p1.y());
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
 
         v->push_back(x_2);
         v->push_back(y_2);
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
 
         v->push_back(x_4);
         v->push_back(y_4);
         v->push_back((float)m_depth);
-		v->push_back(r);
-		v->push_back(g);
-		v->push_back(b);
+        v->push_back(r);
+        v->push_back(g);
+        v->push_back(b);
     }
 
     void DrawQueue::drawText(const Vec2<float>& p, const unsigned int& size, const char* text, const Color& color)
@@ -144,9 +144,9 @@ namespace Orion {
         float x = (float)p.x();
         float y = (float)p.y();
 
-		float r = color.rn();
-		float g = color.gn();
-		float b = color.bn();
+        float r = color.rn();
+        float g = color.gn();
+        float b = color.bn();
 
         while (*text) {
 
@@ -158,27 +158,27 @@ namespace Orion {
                 v->push_back(q.x0);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t0);
 
                 v->push_back(q.x0);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t1);
 
                 v->push_back(q.x1);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t1);
 
@@ -187,27 +187,27 @@ namespace Orion {
                 v->push_back(q.x0);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t0);
 
                 v->push_back(q.x1);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t1);
 
                 v->push_back(q.x1);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
-				v->push_back(r);
-				v->push_back(g);
-				v->push_back(b);
+                v->push_back(r);
+                v->push_back(g);
+                v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t0);
             }
