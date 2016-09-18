@@ -12,12 +12,14 @@ namespace Orion {
     void DefaultStyle::drawButton(DrawQueue * queue, const Vec2<float>& p1, 
         const unsigned int& width, const unsigned int& height, const char * text)
     {
+		int fontSize = 16;
+
         queue->drawPrimRect(p1, (float)width, (float)height, Color(100, 100, 100));
 
-        auto p2 = Vec2<float>(p1.x() + 1, p1.y() + (float)width / 2.0);
+        auto p2 = Vec2<float>(p1.x(), p1.y() + fontSize);
 
 
-        queue->drawText(p2, 16, text, Color(0.0, 0.0, 0.0));
+        queue->drawText(p2, fontSize, text, Color(0.0, 0.0, 0.0));
     }
 
 }

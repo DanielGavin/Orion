@@ -1,8 +1,8 @@
-#include "GL_Renderer.h"
+﻿#include "GL_Renderer.h"
 
 #include <DrawQueue.h>
 #include <Gui.h>
-#include <gl\glew.h>
+#include <gl/glew.h>
 #include <SDL_opengl.h> 
 
 #include <glm/glm.hpp>
@@ -16,25 +16,29 @@
 GL_Renderer::GL_Renderer(Orion::Gui* gui)
     : m_gui(gui)
 {
-    auto font_vertex =
-        "#version 330\n"
-        "layout(location = 0)in vec3 vertex;\n"
-        "layout(location = 1)in vec2 uv;\n"
-        "out vec2 st;\n"
-        "uniform mat4 ortho;\n"
-        "void main(void) {\n"
-        "    st = uv;\n"
+	auto font_vertex =
+		"#version 330\n"
+		"layout(location = 0)in vec3 vertex;\n"
+		"layout(location = 1)in vec3 color;\n"
+		"layout(location = 2)in vec2 uv;\n"
+		"out vec2 st;\n"
+		"out vec3 fragColor;\n"
+		"uniform mat4 ortho;\n"
+		"void main(void) {\n"
+		"    st = uv;\n"
+		"    fragColor = color;\n"
         "    gl_Position = ortho * vec4(vertex, 1.0);\n"
         "}";
 
 
-    auto font_fragment =
-        "#version 330\n"
-        "out vec4 outputColor;\n"
-        "uniform sampler2D atlas;\n"
-        "in vec2 st;\n"
+	auto font_fragment =
+		"#version 330\n"
+		"out vec4 outputColor;\n"
+		"uniform sampler2D atlas;\n"
+		"in vec2 st;\n"
+		"in vec3 fragColor;\n"
         "void main(void) {\n"
-        "    outputColor = vec4(0.0, 0.0, 0.0, texture2D(atlas, st).a);\n"
+        "    outputColor = vec4(fragColor, texture2D(atlas, st).a);\n"
         "}\n";
 
     auto triangles_vertex =
@@ -59,7 +63,7 @@ GL_Renderer::GL_Renderer(Orion::Gui* gui)
     m_fontShaderId = createProgram(font_vertex, font_fragment);
     m_triangleShaderId = createProgram(triangles_vertex, triangles_fragment);
 
-    glm::mat4 projMat = glm::ortho(0.f, 500.f, 400.f, 0.f, -1.f, 2.f);
+    glm::mat4 projMat = glm::ortho(0.f, 900.f, 600.f, 0.f, -1.f, 2.f);
 
 
     //set the uniforms for the font program
@@ -90,9 +94,12 @@ void GL_Renderer::update()
     glBufferData(GL_ARRAY_BUFFER, scene.first.size() * sizeof(float), scene.first.data(), GL_STATIC_DRAW);
 
     glEnable(GL_BLEND);
+    glEnable(GL_SCISSOR_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     for (Orion::CmdInfo info : scene.second) {
+
+        glScissor(info.clip.x, info.clip.y, info.clip.width, info.clip.height);
 
         //triangles
         if (info.textureId == 0) {
@@ -123,11 +130,13 @@ void GL_Renderer::update()
                 glBindBuffer(GL_ARRAY_BUFFER, m_bufferId);
 
                 glEnableVertexAttribArray(0); //vertex
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset));
-                glEnableVertexAttribArray(1); //uv
-                glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset));
+				glEnableVertexAttribArray(1); //color
+				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset + 3 * sizeof(float)));
+                glEnableVertexAttribArray(2); //uv
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, BUFFER_OFFSET(info.offset + 6 * sizeof(float)));
 
-                glDrawArrays(GL_TRIANGLES, 0, info.size / (sizeof(float) * 5));
+                glDrawArrays(GL_TRIANGLES, 0, info.size / (sizeof(float) * 8));
 
                 glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -215,7 +224,7 @@ unsigned int GL_Renderer::createProgram(const char * vertex, const char * fragme
     glLinkProgram(program);
 
 
-    glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
+    glGetProgramiv(program, GL_LINK_STATUS, (int*)&IsLinked);
 
     if (IsLinked == false)
     {

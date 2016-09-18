@@ -1,6 +1,7 @@
 #include "Gui.h"
 
 #include <memory>
+#include <assert.h>
 
 #include "Style.h"
 #include "DrawQueue.h"
@@ -9,7 +10,7 @@
 namespace Orion {
 
     Gui::Gui(const unsigned int& width, const unsigned int& height, Style * style)
-        : m_style(style), m_counter(1), m_queue(new DrawQueue)
+        : m_style(style), m_counter(1), m_queue(new DrawQueue), m_hot(0), m_active(0), m_currentAtlasId(0)
     {
         Clip clip;
         clip.width = (int16_t)width;
@@ -164,6 +165,25 @@ namespace Orion {
         if (!m_textureId.empty()) {
             m_queue->setTextureId(m_textureId.top());
         }
+    }
+
+    void Gui::beginClipRect(const unsigned int& x, const unsigned int& y, const unsigned int& width, const unsigned int& height)
+    {
+        Clip clip;
+        clip.x = (int16_t)x;
+        clip.y = (int16_t)y;
+        clip.width = (int16_t)width;
+        clip.height = (int16_t)height;
+
+        m_clips.push(clip);
+        m_queue->setClipRect(clip);
+    }
+
+    void Gui::endClipRect()
+    {
+        m_clips.pop();
+        assert(!m_clips.empty());
+        m_queue->setClipRect(m_clips.top());
     }
 
 }

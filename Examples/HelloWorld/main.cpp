@@ -11,8 +11,8 @@
 
 using namespace Orion;
 
-const unsigned int screen_width = 500;
-const unsigned int screen_height = 400;
+const unsigned int screen_width = 900;
+const unsigned int screen_height = 600;
 
 char* filetobuf(char *file)
 {
@@ -23,7 +23,7 @@ char* filetobuf(char *file)
     fptr = fopen(file, "rb");
 
     if (!fptr) {
-        return NULL;
+        return nullptr;
     }
 
     fseek(fptr, 0, SEEK_END);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
     glewInit();
 
-    bool exit = 0;
+    bool exit = false;
 
     auto ttf_buffer = filetobuf("c:/windows/fonts/arial.ttf");
 
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
             if (e.type == SDL_WINDOWEVENT) {
                 if (e.window.event == SDL_WINDOWEVENT_CLOSE) {
-                    exit = 1;
+                    exit = true;
                 }
             }
 
@@ -101,9 +101,11 @@ int main(int argc, char *argv[])
         glClearColor(0.3, 0.3, 0.3, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        gui.label(100, 100, 16, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 255, 255));
+        gui.label(100, 100, 16, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 0, 255));
+		gui.label(100, 300, 40, "The thread 0x155c has exited with code 0 (0x0).", Color(255, 255, 0));
+		gui.label(100, 350, 8, "The thread 0x155c has exited with code 0 (0x0).", Color(0, 255, 255));
 
-        if (gui.button(20, 20, 30, 30, "hello")) {
+        if (gui.button(20, 20, 80, 20, "hello world")) {
             printf("hello world");
         }
 

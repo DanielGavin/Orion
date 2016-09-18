@@ -4,7 +4,7 @@
 namespace Orion {
 
     DrawQueue::DrawQueue()
-        : m_depth(0), m_currentTextureId(0)
+        : m_depth(0), m_currentTextureId(0), m_font(nullptr)
     {
     }
 
@@ -49,7 +49,7 @@ namespace Orion {
 
     void DrawQueue::drawPrimTriangle(const Vec2<float>& p1, const Vec2<float>& p2, const Vec2<float>& p3, const Color& color)
     {
-        CmdDataVector* v = &m_cmdTriangles[0][(int64_t)&m_currentClip];
+        CmdDataVector* v = &m_cmdTriangles[0][*(int64_t*)&m_currentClip];
 
         v->push_back(p1.x());
         v->push_back(p1.y());
@@ -76,7 +76,7 @@ namespace Orion {
     void DrawQueue::drawPrimRect(const Vec2<float>& p1, const float& width, const float& height, const Color& color)
     {
         //could store the pointer to the current command per texture id and clip change.
-        CmdDataVector* v = &m_cmdTriangles[0][(int64_t)&m_currentClip];
+        CmdDataVector* v = &m_cmdTriangles[0][*(int64_t*)&m_currentClip];
 
         /* p1      p4*/
         /* p3      p2*/
@@ -89,80 +89,96 @@ namespace Orion {
         float x_4 = p1.x() + width;
         float y_4 = p1.y();
 
+		float r = color.rn();
+		float g = color.gn();
+		float b = color.bn();
+
         //half rects
         v->push_back(p1.x());
         v->push_back(p1.y());
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
 
         v->push_back(x_3);
         v->push_back(y_3);
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
 
         v->push_back(x_2);
         v->push_back(y_2);
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
 
         v->push_back(p1.x());
         v->push_back(p1.y());
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
 
         v->push_back(x_2);
         v->push_back(y_2);
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
 
         v->push_back(x_4);
         v->push_back(y_4);
         v->push_back((float)m_depth);
-        v->push_back(color.rn());
-        v->push_back(color.gn());
-        v->push_back(color.bn());
+		v->push_back(r);
+		v->push_back(g);
+		v->push_back(b);
     }
 
     void DrawQueue::drawText(const Vec2<float>& p, const unsigned int& size, const char* text, const Color& color)
     {
-        //TODO(currently just test code, does not handle different size fonts)
-        CmdDataVector* v = &m_cmdTriangles[m_currentTextureId][(int64_t)&m_currentClip];
+        CmdDataVector* v = &m_cmdTriangles[m_currentTextureId][*(int64_t*)&m_currentClip];
 
         float x = (float)p.x();
         float y = (float)p.y();
+
+		float r = color.rn();
+		float g = color.gn();
+		float b = color.bn();
 
         while (*text) {
 
             if (*text >= 32 && *text <= 128) {
 
-                auto q = m_font->quadAsciiCharacter(&x, &y, *text);
+                auto q = m_font->quadAsciiCharacter(&x, &y, *text, size);
 
                 //first half rects
                 v->push_back(q.x0);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t0);
 
                 v->push_back(q.x0);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t1);
 
                 v->push_back(q.x1);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t1);
 
@@ -171,18 +187,27 @@ namespace Orion {
                 v->push_back(q.x0);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s0);
                 v->push_back(q.t0);
 
                 v->push_back(q.x1);
                 v->push_back(q.y1);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t1);
 
                 v->push_back(q.x1);
                 v->push_back(q.y0);
                 v->push_back((float)m_depth);
+				v->push_back(r);
+				v->push_back(g);
+				v->push_back(b);
                 v->push_back(q.s1);
                 v->push_back(q.t0);
             }
